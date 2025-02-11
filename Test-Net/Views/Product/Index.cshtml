@@ -3,8 +3,6 @@
 }
 
 <h2 class="mb-4">Danh sách sản phẩm</h2>
-
-<!-- Form thêm sản phẩm -->
 <div class="row">
     <div class="col-md-3">
         <label for="productName">Tên sản phẩm:</label>
@@ -30,25 +28,18 @@
     </div>
 </div>
 <button type="button" class="btn btn-success mt-3" onclick="addProduct()">Thêm sản phẩm</button>
-
-<!-- Nút chuyển trang -->
 <div class="mt-3">
     <button class="btn btn-primary" onclick="goToProductTypePage()">Trang Loại Sản Phẩm</button>
     <button id="deleteAllBtn" class="btn btn-danger">Xóa hết sản phẩm</button>
-
 </div>
-
 <script>
     function goToProductPage() {
         window.location.href = "/Product/Index";
     }
-
     function goToProductTypePage() {
         window.location.href = "/ProductType/Index";
     }
 </script>
-
-
 <table id="productTable" class="table table-bordered">
     <thead class="thead-dark">
         <tr>
@@ -96,9 +87,6 @@
         </div>
     </div>
 </div>
-
-
-<!-- Thông báo -->
 <div id="message" class="alert d-none mt-3"></div>
 
 @section Scripts {
@@ -157,8 +145,6 @@
             let price = $("#productPrice").val().trim();
             let date = $("#productDate").val();
             let loaiSanPhamId = $("#productType").val();
-
-            // Xóa thông báo lỗi trước khi kiểm tra
             $("#errorName, #errorDate, #errorType, #errorPrice").text("");
 
             // Kiểm tra dữ liệu trước khi gửi request
@@ -217,8 +203,6 @@
             let date = $("#editProductDate").val();
 
             $("#editErrorName, #editErrorDate").text("");
-
-            // Kiểm tra dữ liệu đầu vào
             if (!name) {
                 $("#editErrorName").text("Tên sản phẩm không được để trống.");
                 return;
@@ -231,7 +215,6 @@
                 showMessage("Giá sản phẩm phải lớn hơn 0.", "danger");
                 return;
             }
-
             let data = { id, ten: name, gia: price, ngayNhap: date };
 
             $.ajax({
@@ -282,11 +265,11 @@
                 url: "/Product/Delete",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify(id),  // Gửi ID dưới dạng JSON
+                data: JSON.stringify(id),  
                 success: function (response) {
                     if (response.success) {
                         showMessage(response.message, "success");
-                        loadProducts(); // Load lại danh sách thay vì chỉ xóa dòng
+                        loadProducts(); 
                     }
                 },
                 error: function (xhr) {
