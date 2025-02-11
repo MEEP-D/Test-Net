@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Test_Net</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
+    <Compile Include="obj\Debug\net8.0\Test-Net.AssemblyInfo.cs" />
+    <Compile Include="obj\Debug\net8.0\Test-Net.GlobalUsings.g.cs" />
+    <Compile Include="obj\Debug\net8.0\Test-Net.RazorAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="obj\Debug\net8.0\scopedcss\bundle\Test-Net.styles.css" />
+    <Content Include="obj\Debug\net8.0\scopedcss\projectbundle\Test-Net.bundle.scp.css" />
+    <Content Include="obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css" />
+    <Content Include="obj\Debug\net8.0\staticwebassets.build.json" />
+    <Content Include="obj\Debug\net8.0\staticwebassets.development.json" />
+    <Content Include="obj\Debug\net8.0\staticwebassets.pack.json" />
+    <Content Include="obj\Debug\net8.0\Test-Net.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\project.assets.json" />
+    <Content Include="obj\Test-Net.csproj.nuget.dgspec.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\net8.0\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="obj\Debug\net8.0\apphost.exe" />
+    <None Include="obj\Debug\net8.0\project.razor.vs.bin" />
+    <None Include="obj\Debug\net8.0\refint\Test-Net.dll" />
+    <None Include="obj\Debug\net8.0\ref\Test-Net.dll" />
+    <None Include="obj\Debug\net8.0\staticwebassets\msbuild.build.Test-Net.props" />
+    <None Include="obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.Test-Net.props" />
+    <None Include="obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.Test-Net.props" />
+    <None Include="obj\Debug\net8.0\staticwebassets\msbuild.Test-Net.Microsoft.AspNetCore.StaticWebAssets.props" />
+    <None Include="obj\Debug\net8.0\Test-Net.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\net8.0\Test-Net.assets.cache" />
+    <None Include="obj\Debug\net8.0\Test-Net.csproj.AssemblyReference.cache" />
+    <None Include="obj\Debug\net8.0\Test-Net.csproj.BuildWithSkipAnalyzers" />
+    <None Include="obj\Debug\net8.0\Test-Net.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\net8.0\Test-Net.csproj.Up2Date" />
+    <None Include="obj\Debug\net8.0\Test-Net.dll" />
+    <None Include="obj\Debug\net8.0\Test-Net.GeneratedMSBuildEditorConfig.editorconfig" />
+    <None Include="obj\Debug\net8.0\Test-Net.genruntimeconfig.cache" />
+    <None Include="obj\Debug\net8.0\Test-Net.MvcApplicationPartsAssemblyInfo.cache" />
+    <None Include="obj\Debug\net8.0\Test-Net.pdb" />
+    <None Include="obj\Debug\net8.0\Test-Net.RazorAssemblyInfo.cache" />
+    <None Include="obj\project.nuget.cache" />
+    <None Include="obj\Test-Net.csproj.nuget.g.props" />
+    <None Include="obj\Test-Net.csproj.nuget.g.targets" />
+  </ItemGroup>
+
+</Project>

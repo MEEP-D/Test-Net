@@ -1,0 +1,323 @@
+﻿@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
+
+<h2 class="mb-4">Danh sách sản phẩm</h2>
+
+<!-- Form thêm sản phẩm -->
+<div class="row">
+    <div class="col-md-3">
+        <label for="productName">Tên sản phẩm:</label>
+        <input type="text" id="productName" class="form-control">
+        <span class="text-danger" id="errorName"></span>
+    </div>
+    <div class="col-md-3">
+        <label for="productPrice">Giá:</label>
+        <input type="number" id="productPrice" class="form-control">
+        <span class="text-danger" id="errorPrice"></span>
+    </div>
+    <div class="col-md-3">
+        <label for="productDate">Ngày nhập:</label>
+        <input type="date" id="productDate" class="form-control">
+        <span class="text-danger" id="errorDate"></span>
+    </div>
+    <div class="col-md-3">
+        <label for="productType">Loại sản phẩm:</label>
+        <select id="productType" class="form-control">
+            <option value="">-- Chọn loại sản phẩm --</option>
+        </select>
+        <span class="text-danger" id="errorType"></span>
+    </div>
+</div>
+<button type="button" class="btn btn-success mt-3" onclick="addProduct()">Thêm sản phẩm</button>
+
+<!-- Nút chuyển trang -->
+<div class="mt-3">
+    <button class="btn btn-primary" onclick="goToProductTypePage()">Trang Loại Sản Phẩm</button>
+    <button id="deleteAllBtn" class="btn btn-danger">Xóa hết sản phẩm</button>
+
+</div>
+
+<script>
+    function goToProductPage() {
+        window.location.href = "/Product/Index";
+    }
+
+    function goToProductTypePage() {
+        window.location.href = "/ProductType/Index";
+    }
+</script>
+
+
+<table id="productTable" class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Ngày nhập</th>
+            <th>Loại Sản Phẩm</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa sản phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editProductId">
+                <div class="form-group">
+                    <label for="editProductName">Tên sản phẩm:</label>
+                    <input type="text" id="editProductName" class="form-control">
+                    <span class="text-danger" id="editErrorName"></span>
+                </div>
+                <div class="form-group">
+                    <label for="editProductPrice">Giá:</label>
+                    <input type="number" id="editProductPrice" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="editProductDate">Ngày nhập:</label>
+                    <input type="date" id="editProductDate" class="form-control">
+                    <span class="text-danger" id="editErrorDate"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="editProduct()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Thông báo -->
+<div id="message" class="alert d-none mt-3"></div>
+
+@section Scripts {
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            loadProducts();
+        });
+
+        function loadProducts() {
+            $.getJSON("/Product/GetData", function (response) {
+                let tbody = $("#productTable tbody");
+                tbody.empty();
+
+                if (!response.data || response.data.length === 0) {
+                    tbody.html('<tr><td colspan="4" class="text-center">Không có sản phẩm.</td></tr>');
+                    return;
+                }
+
+                let rows = response.data.map(product => `
+            <tr id="row-${product.id}">
+                <td>${product.id}</td>
+                <td>${product.ten}</td>
+                <td>${formatCurrency(product.gia)}</td>
+                <td>${formatDate(product.ngayNhap)}</td>
+                <td>${product.loaiSanPham || "Không xác định" }</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="openEditModal(${product.id}, '${product.ten}', ${product.gia}, '${product.ngayNhap}')">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Xóa</button>
+                </td>
+            </tr>
+        `).join("");
+
+
+                tbody.html(rows);
+            });
+        }
+        $(document).ready(function () {
+            loadProductTypes();
+        });
+
+        function loadProductTypes() {
+            $.getJSON("/Product/GetProductTypes", function (data) {
+                let select = $("#productType");
+                select.empty().append('<option value="">-- Chọn loại sản phẩm --</option>');
+
+                data.forEach(type => {
+                    select.append(`<option value="${type.id}">${type.ten}</option>`);
+                });
+            });
+        }
+
+        function addProduct() {
+            let name = $("#productName").val().trim();
+            let price = $("#productPrice").val().trim();
+            let date = $("#productDate").val();
+            let loaiSanPhamId = $("#productType").val();
+
+            // Xóa thông báo lỗi trước khi kiểm tra
+            $("#errorName, #errorDate, #errorType, #errorPrice").text("");
+
+            // Kiểm tra dữ liệu trước khi gửi request
+            if (!name) {
+                $("#errorName").text("Tên sản phẩm không được để trống.");
+                return;
+            }
+            if (!date) {
+                $("#errorDate").text("Ngày nhập không hợp lệ.");
+                return;
+            }
+            if (!price || parseFloat(price) <= 0) {
+                $("#errorPrice").text("Giá sản phẩm phải lớn hơn 0.");
+                return;
+            }
+            if (!loaiSanPhamId) {
+                $("#errorType").text("Vui lòng chọn loại sản phẩm.");
+                return;
+            }
+
+            $.ajax({
+                url: "/Product/Add",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    ten: name,
+                    gia: parseFloat(price),
+                    ngayNhap: date,
+                    productTypeId: parseInt(loaiSanPhamId)
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        showMessage(response.message, "success");
+                        $("#addProductForm")[0].reset();
+                        loadProducts(); // Cập nhật danh sách sản phẩm
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON) {
+                        let errors = xhr.responseJSON;
+                        $("#errorName").text(errors.Ten || "");
+                        $("#errorDate").text(errors.NgayNhap || "");
+                        $("#errorPrice").text(errors.Gia || "");
+                        $("#errorType").text(errors.ProductTypeId || "");
+                    } else {
+                        showMessage("Đã xảy ra lỗi, vui lòng thử lại!", "danger");
+                    }
+                }
+            });
+        }
+
+        function editProduct() {
+            let id = $("#editProductId").val();
+            let name = $("#editProductName").val().trim();
+            let price = $("#editProductPrice").val();
+            let date = $("#editProductDate").val();
+
+            $("#editErrorName, #editErrorDate").text("");
+
+            // Kiểm tra dữ liệu đầu vào
+            if (!name) {
+                $("#editErrorName").text("Tên sản phẩm không được để trống.");
+                return;
+            }
+            if (!date) {
+                $("#editErrorDate").text("Ngày nhập không hợp lệ.");
+                return;
+            }
+            if (price <= 0 || isNaN(price)) {
+                showMessage("Giá sản phẩm phải lớn hơn 0.", "danger");
+                return;
+            }
+
+            let data = { id, ten: name, gia: price, ngayNhap: date };
+
+            $.ajax({
+                url: "/Product/Edit",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    showMessage("Sửa sản phẩm thành công!", "success");
+                    $("#editModal").modal("hide");
+                    loadProducts();
+                },
+                error: function (xhr) {
+                    console.error("Lỗi khi sửa sản phẩm:", xhr);
+                    if (xhr.responseJSON) {
+                        showMessage(xhr.responseJSON.message, "danger");
+                    }
+                }
+            });
+
+        }
+        
+            document.getElementById("deleteAllBtn").addEventListener("click", function () {
+                if (confirm("Bạn có chắc chắn muốn xóa tất cả sản phẩm?")) {
+                    fetch('/Product/DeleteAll', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message);
+                            if (data.success) {
+                                location.reload();
+                            }
+                        })
+                        .catch(error => console.error("Lỗi:", error));
+                }
+            });
+
+
+
+
+
+        function deleteProduct(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+
+            $.ajax({
+                url: "/Product/Delete",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(id),  // Gửi ID dưới dạng JSON
+                success: function (response) {
+                    if (response.success) {
+                        showMessage(response.message, "success");
+                        loadProducts(); // Load lại danh sách thay vì chỉ xóa dòng
+                    }
+                },
+                error: function (xhr) {
+                    showMessage("Xóa sản phẩm thất bại! " + xhr.responseText, "danger");
+                }
+            });
+        }
+        function openEditModal(id, name, price, date) {
+            $("#editProductId").val(id);
+            $("#editProductName").val(name);
+            $("#editProductPrice").val(price);
+            $("#editProductDate").val(date);
+
+            $("#editModal").modal("show");
+        }
+
+
+        function showMessage(text, type) {
+            let messageDiv = $("#message");
+            messageDiv.removeClass("d-none").removeClass("alert-success alert-danger").addClass(`alert-${type}`).text(text);
+            setTimeout(() => messageDiv.addClass("d-none"), 3000);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            let date = new Date(dateString);
+            return date.toLocaleDateString("vi-VN");
+        }
+
+    </script>
+}

@@ -1,0 +1,151 @@
+﻿@{
+    ViewData["Title"] = "Quản lý loại sản phẩm";
+}
+
+<h2>Quản lý loại sản phẩm</h2>
+<button class="btn btn-primary mb-3" onclick="openModal()">Thêm loại sản phẩm</button>
+
+<table id="productTypeTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên loại sản phẩm</th>
+            <th>Số lượng sản phẩm</th>
+            <th>Ngày nhập</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+</table>
+
+<!-- Modal Thêm/Sửa -->
+<div id="productTypeModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm loại sản phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productTypeId">
+                <div class="form-group">
+                    <label>Tên loại sản phẩm</label>
+                    <input type="text" id="productTypeName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Ngày nhập</label>
+                    <input type="date" id="productTypeDate" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="saveProductType()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <script>
+        $(document).ready(function () {
+            loadTable();
+        });
+
+        function loadTable() {
+            $('#productTypeTable').DataTable({
+                destroy: true,
+                ajax: {
+                    url: '/ProductType/GetData',
+                    type: 'GET',
+                    dataSrc: 'data'
+                },
+                columns: [
+                    { data: 'id' },
+                    { data: 'ten' },
+                    { data: 'soLuongSanPham' },
+                    { data: 'ngayNhap' },
+                    {
+                        data: 'id',
+                        render: function (data) {
+                            return `
+                                        <button class="btn btn-warning btn-sm" onclick="editProductType(${data})">Sửa</button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteProductType(${data})">Xóa</button>
+                                    `;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function openModal(id = 0, name = '', date = '') {
+            $('#productTypeId').val(id);
+            $('#productTypeName').val(name);
+            $('#productTypeDate').val(date);
+            $('#modalTitle').text(id ? 'Chỉnh sửa loại sản phẩm' : 'Thêm loại sản phẩm');
+            $('#productTypeModal').modal('show');
+        }
+
+        function saveProductType() {
+            var id = $('#productTypeId').val().trim();
+            var data = {
+                Id: id ? parseInt(id) : 0, // Chuyển đổi ID thành số nguyên hoặc 0 nếu rỗng
+                Ten: $('#productTypeName').val().trim(),
+                NgayNhap: $('#productTypeDate').val()
+            };
+
+            // Kiểm tra nếu tên để trống
+            if (!data.Ten) {
+                alert("Tên loại sản phẩm không được để trống!");
+                return;
+            }
+
+            console.log("Dữ liệu gửi lên:", data); // Debug dữ liệu gửi lên
+
+            $.ajax({
+                url: data.Id > 0 ? '/ProductType/Edit' : '/ProductType/Add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function () {
+                    alert(data.Id > 0 ? "Cập nhật thành công!" : "Thêm thành công!");
+                    $('#productTypeModal').modal('hide');
+                    $('#productTypeTable').DataTable().ajax.reload();
+                },
+                error: function (response) {
+                    console.error("Lỗi:", response);
+                    alert(response.responseJSON ? response.responseJSON.message : "Có lỗi xảy ra!");
+                }
+            });
+        }
+
+
+
+        function editProductType(id) {
+            $.getJSON('/ProductType/GetData', function (data) {
+                var item = data.data.find(p => p.id == id);
+                if (item) {
+                    openModal(item.id, item.ten, item.ngayNhap);
+                }
+            });
+        }
+
+        function deleteProductType(id) {
+            if (confirm("Bạn có chắc muốn xóa?")) {
+                $.ajax({
+                    url: '/ProductType/Delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(id),
+                    success: function () {
+                        $('#productTypeTable').DataTable().ajax.reload();
+                    },
+                    error: function (response) {
+                        alert(response.responseJSON.message);
+                    }
+                });
+            }
+        }
+    </script>
+}
