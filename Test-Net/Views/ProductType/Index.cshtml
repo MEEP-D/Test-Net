@@ -17,7 +17,6 @@
     </thead>
 </table>
 
-<!-- Modal Thêm/Sửa -->
 <div id="productTypeModal" class="modal fade" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -90,7 +89,7 @@
         function saveProductType() {
             var id = $('#productTypeId').val().trim();
             var data = {
-                Id: id ? parseInt(id) : 0, // Chuyển đổi ID thành số nguyên hoặc 0 nếu rỗng
+                Id: id ? parseInt(id) : 0,
                 Ten: $('#productTypeName').val().trim(),
                 NgayNhap: $('#productTypeDate').val()
             };
@@ -101,7 +100,7 @@
                 return;
             }
 
-            console.log("Dữ liệu gửi lên:", data); // Debug dữ liệu gửi lên
+            console.log("Dữ liệu gửi lên:", data);
 
             $.ajax({
                 url: data.Id > 0 ? '/ProductType/Edit' : '/ProductType/Add',
