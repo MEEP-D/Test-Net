@@ -30,7 +30,7 @@ namespace Test_Net.Controllers
                     p.Ten,
                     p.Gia,
                     p.NgayNhap,
-                    LoaiSanPham = p.ProductType.Ten // Lấy tên loại sản phẩm
+                    LoaiSanPham = p.ProductType.Ten 
                 })
                 .ToListAsync();
 
@@ -48,9 +48,7 @@ namespace Test_Net.Controllers
 
         public async Task<IActionResult> Add([FromBody] Product model)
         {
-            var errors = new Dictionary<string, string>();
-
-            // Kiểm tra tên sản phẩm
+            var errors = new Dictionary<string, string>(); 
             if (string.IsNullOrWhiteSpace(model.Ten))
             {
                 errors["Ten"] = "Tên sản phẩm không được để trống.";
@@ -58,30 +56,21 @@ namespace Test_Net.Controllers
             else if (await _context.Products.AnyAsync(p => p.Ten == model.Ten))
             {
                 errors["Ten"] = "Tên sản phẩm đã tồn tại.";
-            }
-
-            // Kiểm tra ngày nhập
+            }       
             if (model.NgayNhap == null || model.NgayNhap > DateTime.UtcNow)
             {
                 errors["NgayNhap"] = "Ngày nhập không hợp lệ.";
-            }
-
-            // Kiểm tra loại sản phẩm
+            }            
             if (model.ProductTypeId <= 0 || !await _context.ProductTypes.AnyAsync(pt => pt.Id == model.ProductTypeId))
             {
                 errors["ProductTypeId"] = "Loại sản phẩm không hợp lệ.";
             }
-
-            // Nếu có lỗi, trả về BadRequest
             if (errors.Count > 0)
             {
                 return BadRequest(errors);
-            }
-
-            // Thêm sản phẩm vào database
+            }    
             _context.Products.Add(model);
             await _context.SaveChangesAsync();
-
             return Json(new { success = true, message = "Thêm sản phẩm thành công!" });
         }
 
@@ -100,9 +89,7 @@ namespace Test_Net.Controllers
                 existingProduct.Ten = model.Ten;
                 existingProduct.Gia = model.Gia;
                 existingProduct.NgayNhap = model.NgayNhap;
-
                 await _context.SaveChangesAsync();
-
                 return Json(new { success = true, message = "Cập nhật sản phẩm thành công!" });
             }
             return BadRequest(new { success = false});
@@ -118,7 +105,6 @@ namespace Test_Net.Controllers
             {
                 return NotFound(new { success = false, message = "Sản phẩm không tồn tại!" });
             }
-
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return Json(new { success = true, message = "Xóa sản phẩm thành công!" });
