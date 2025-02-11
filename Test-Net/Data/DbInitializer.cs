@@ -10,8 +10,6 @@ namespace Test_Net.Data
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 context.Database.EnsureCreated();
                 var random = new Random();
-
-                // Tạo loại sản phẩm nếu chưa có
                 if (!context.ProductTypes.Any())
                 {
                     var productTypes = new List<ProductType>();
@@ -26,11 +24,7 @@ namespace Test_Net.Data
                     context.ProductTypes.AddRange(productTypes);
                     context.SaveChanges();
                 }
-
-                // Lấy danh sách ID của loại sản phẩm đã tồn tại
                 var productTypesList = context.ProductTypes.ToList();
-
-                // Tạo sản phẩm nếu chưa có
                 if (!context.Products.Any())
                 {
                     var products = new List<Product>();
@@ -42,7 +36,7 @@ namespace Test_Net.Data
                             Ten = "Sản phẩm " + i,
                             Gia = random.Next(1000, 50000),
                             NgayNhap = DateTime.Now.AddDays(-random.Next(1, 365)),
-                            ProductTypeId = productTypesList[random.Next(productTypesList.Count)].Id // Chọn ID từ danh sách có sẵn
+                            ProductTypeId = productTypesList[random.Next(productTypesList.Count)].Id 
                         };
                         products.Add(product);
                     }
