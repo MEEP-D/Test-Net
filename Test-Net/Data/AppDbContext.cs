@@ -10,14 +10,11 @@ public class AppDbContext : DbContext
     public DbSet<ProductProductType> ProductProductTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // Cấu hình khóa chính của bảng trung gian Many-to-Many
-        modelBuilder.Entity<Product>()
+    {        modelBuilder.Entity<Product>()
             .HasOne(p => p.ProductType)
             .WithMany(pt => pt.Products)
             .HasForeignKey(p => p.ProductTypeId)
-            .OnDelete(DeleteBehavior.Restrict); // Ngăn chặn xóa ProductType nếu còn Product
-
+            .OnDelete(DeleteBehavior.Restrict); 
         base.OnModelCreating(modelBuilder);
     }
 
